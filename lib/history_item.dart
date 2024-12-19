@@ -1,26 +1,47 @@
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
 
-class AddHistoryPage extends StatelessWidget {
+class AddHistoryPage extends StatefulWidget {
   final int itemId;
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _quantityController = TextEditingController();
-  final TextEditingController _dateController = TextEditingController();
-  String _transactionType = 'Masuk';
 
   AddHistoryPage({required this.itemId});
+
+  @override
+  State<AddHistoryPage> createState() => _AddHistoryPageState();
+}
+
+class _AddHistoryPageState extends State<AddHistoryPage> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _quantityController = TextEditingController();
+  late TextEditingController _dateController = TextEditingController();
+  String _transactionType = 'Masuk';
 
   void _saveHistory(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       final history = {
-        'item_id': itemId,
+        'item_id': widget.itemId,
         'transaction_type': _transactionType,
         'quantity': int.parse(_quantityController.text),
         'date': _dateController.text,
       };
-      await DatabaseHelper.instance.insertHistory(history);
+      await DatabaseHelper.instance.addHistory(widget.itemId, _transactionType, int.parse(_quantityController.text));
       Navigator.pop(context);
     }
+  }
+
+@override
+  void initState() {
+    super.initState();
+    // Set default value menjadi tanggal saat ini
+    _dateController = TextEditingController(
+      text: DateTime.now().toIso8601String().split('T')[0], // Format: yyyy-MM-dd
+    );
+  }
+
+  @override
+  void dispose() {
+    _dateController.dispose();
+    super.dispose();
   }
 
   @override

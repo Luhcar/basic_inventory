@@ -1,4 +1,4 @@
-import 'package:basic_inventory/add_item.dart';
+import 'package:basic_inventory/edit.dart';
 import 'package:basic_inventory/history_item.dart';
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
@@ -48,7 +48,7 @@ class _ItemDetailPage extends State<ItemDetailPage> {
           children: [
             item['imagePath'] != null
                 ? Image.file(File(item['imagePath']),
-                    height: 200, fit: BoxFit.cover)
+                    height: 300, width: 330, fit: BoxFit.cover)
                 : Text('No Image Available'),
             SizedBox(height: 16.0),
             Text('Nama: ${item['name']}', style: TextStyle(fontSize: 18)),
@@ -65,8 +65,8 @@ class _ItemDetailPage extends State<ItemDetailPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AddItemPage(
-                      item: item, 
+                    builder: (context) => EditItemPage(
+                      item: item,
                     ),
                   ),
                 ).then((_) {

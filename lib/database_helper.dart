@@ -54,6 +54,7 @@ class DatabaseHelper {
         transaction_type TEXT,
         quantity INTEGER,
         date TEXT
+        FOREIGN KEY (item_id) REFERENCES items (id)
       )
     ''');
   }
@@ -85,10 +86,15 @@ class DatabaseHelper {
     return await db.delete(table, where: '$columnId = ?', whereArgs: [id]);
   }
 
-  Future<int> insertHistory(Map<String, dynamic> history) async {
-    final db = await database;
-    return await db.insert('history', history);
-  }
+  Future<void> addHistory(int itemId, String transactionType, int quantity) async {
+  final db = await instance.database;
+  await db.insert('history', {
+    'item_id': itemId,
+    'transaction_type': transactionType,
+    'quantity': quantity,
+    'date': DateTime.now().toIso8601String()
+  });
+}
 
   Future<List<Map<String, dynamic>>> getHistory(int itemId) async {
     final db = await database;
@@ -98,5 +104,36 @@ class DatabaseHelper {
       whereArgs: [itemId],
     );
   }
+
+Future<void> updateStock(int id, int quantity, String transactionType) async {
+  final db = await instance.database;
+
+  // Ambil stok saat ini dari tabel items
+  final result = await db.query('items', where: 'id = ?', whereArgs: [id]);
+  if (result.isNotEmpty) {
+    final currentStock = result.first['quantity'] as int;
+
+    int newStock = currentStock;
+    if (transactionType == 'Keluar') {
+      if (currentStock >= quantity) {
+        newStock = currentStock - quantity;
+      } else {
+        throw Exception("Stok tidak mencukupi!");
+      }
+    } else if (transactionType == 'Masuk') {
+      newStock = currentStock + quantity;
+    } else {
+      throw Exception("Jenis transaksi tidak valid");
+    }
+
+    // Update stok di tabel items
+    await db.update('items', {'quantity': newStock}, where: 'id = ?', whereArgs: [id]);
+
+    // Tambahkan catatan ke tabel history
+    await addHistory(id, transactionType, quantity);
+  } else {
+    throw Exception("Barang tidak ditemukan!");
+  }
+}
 
 }

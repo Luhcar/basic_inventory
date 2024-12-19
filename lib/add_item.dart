@@ -5,7 +5,9 @@ import 'database_helper.dart';
 
 class AddItemPage extends StatefulWidget {
   final Map<String, dynamic>? item;
+
   AddItemPage({Key? key, this.item}) : super(key: key);
+  
   @override
   _AddItemPageState createState() => _AddItemPageState();
   }

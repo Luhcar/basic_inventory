@@ -8,6 +8,7 @@ import 'dart:io';
 class ItemListPage extends StatefulWidget {
   @override
   _ItemListPageState createState() => _ItemListPageState();
+  const ItemListPage({Key? key}) : super(key: key);
 }
 
 class _ItemListPageState extends State<ItemListPage> {
@@ -66,7 +67,7 @@ class _ItemListPageState extends State<ItemListPage> {
                         item: item,
                       ),
                   ),
-                )..then((_) {
+                ).then((_) {
                     setState(() {
                       _fetchItems();
                     });
